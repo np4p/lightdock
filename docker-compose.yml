@@ -7,6 +7,21 @@ volumes:
     driver: ${VOLUMES_DRIVER}
 
 services:
+  php-cli:
+    build:
+      context: ./php-cli
+      args:
+        - CLI_VERSION=${CLI_VERSION}
+        - CHANGE_SOURCE=${CHANGE_SOURCE}
+    environment:
+      - TZ=${TIMEZONE}
+    volumes:
+      - ${CODE_PATH_HOST}:/var/www/
+    depends_on:
+      - mysql
+      - redis
+    tty: true
+    restart: on-failure
   php-fpm:
     build:
       context: ./php-fpm
@@ -16,7 +31,7 @@ services:
     environment:
       - TZ=${TIMEZONE}
     volumes:
-      - ${CODE_PATH_HOST}:/var/www/html
+      - ${CODE_PATH_HOST}:/var/www/
     expose:
       - "9000"
     depends_on:

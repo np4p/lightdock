@@ -1,9 +1,6 @@
 ARG FPM_VERSION
 FROM php:${FPM_VERSION}-fpm
 
-# Set Environment Variables
-ENV DEBIAN_FRONTEND noninteractive
-
 ARG TZ=PRC
 ENV TZ ${TZ}
 
@@ -35,8 +32,6 @@ RUN set -eux; \
     rm -rf /var/lib/apt/lists/*
 
 RUN set -eux; \
-    # Install the PHP redis extensions
-    docker-php-ext-enable redis; \
     # Install the PHP pdo_mysql extention
     docker-php-ext-install pdo_mysql; \
     # Install the PHP pdo_pgsql extention
@@ -50,11 +45,15 @@ RUN set -eux; \
             --with-freetype; \
     docker-php-ext-install gd;
 
+RUN pecl install -o -f redis \
+    &&  rm -rf /tmp/pear \
+    &&  docker-php-ext-enable redis
+
 COPY ./php.ini /usr/local/etc/php/conf.d/php.ini
 COPY ./opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
 #Give permission
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data /var/www/
 
 # Clean up
 RUN apt-get clean && \
@@ -62,4 +61,4 @@ RUN apt-get clean && \
     rm /var/log/lastlog /var/log/faillog
 
 # Set default work directory
-WORKDIR /var/www/html
+WORKDIR /var/www/

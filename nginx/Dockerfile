@@ -5,7 +5,7 @@ ARG TZ=PRC
 ENV TZ ${TZ}
 
 COPY nginx.conf /etc/nginx/
-COPY conf.d/ /etc/nginx/conf.d/
+COPY conf.d/*.conf /etc/nginx/conf.d/
 
 # Create 'messages' file used from 'logrotate'
 RUN touch /var/log/messages

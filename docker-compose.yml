@@ -21,6 +21,7 @@ services:
       - "9000"
     depends_on:
       - mysql
+      - redis
     restart: on-failure
   mysql:
     build:
@@ -38,6 +39,18 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - TZ=${TIMEZONE}
     restart: on-failure
+  redis:
+    build:
+      context: ./redis
+      args:
+        - REDIS_VERSION=${REDIS_VERSION}
+    volumes:
+      - ${DATA_PATH_HOST}/redis:/data
+    environment:
+      - TZ=${TIMEZONE}
+    ports:
+      - "${REDIS_PORT}:6379"
+    restart: on-failure
   nginx:
     build:
       context: ./nginx
@@ -46,7 +59,7 @@ services:
     environment:
       - TZ=${TIMEZONE}
     volumes:
-      - ${CODE_PATH_HOST}:/var/www/html
+      - ${CODE_PATH_HOST}:/var/www/
       - ${NGINX_SSL_PATH}:/etc/nginx/ssl
     ports:
       - "${NGINX_HTTP_PORT}:80"

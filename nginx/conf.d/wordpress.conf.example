@@ -1,6 +1,8 @@
 server {
+        listen 80;
+
         ## Your website name goes here.
-        server_name domain.tld;
+        server_name wordpress.test;
         ## Your only path reference.
         root /var/www/wordpress;
         ## This should be in your http block and if it is, it's not needed here.
@@ -24,12 +26,11 @@ server {
         }
 
         location ~ \.php$ {
-                #NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
-                include fastcgi.conf;
-                fastcgi_intercept_errors on;
                 fastcgi_pass php-fpm:9000;
                 fastcgi_buffers 16 16k;
                 fastcgi_buffer_size 32k;
+                fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+                include fastcgi_params;
         }
 
         location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
